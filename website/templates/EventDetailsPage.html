@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Details - FitTogether{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb / back -->
+  <nav class="mb-3" aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a id="breadcrumbHome" href="{{ url_for('main.index') }}">Home</a></li>
+      <li class="breadcrumb-item"><a id="breadcrumbCategory" href="{{url_for('main.view_category', category_name=category_name)}}">{{category_name}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{event.title}}</li>
+    </ol>
+  </nav>
+ 
+  <!-- Title + meta -->
+  <header class="mb-3">
+    <h1 id="eventTitle" class="h3 mb-2">{{event.title}}</h1>
+    <ul class="list-inline text-muted small m-0">
+      <li class="list-inline-item me-3" id="eventDateTime">
+        <i class="bi bi-calendar-event me-1"></i> {{event.start_time.strftime('%d %b %Y, %I:%M %p')}} - {{event.end_time.strftime('%d %b %Y, %I:%M %p')}}
+      </li>
+      <li class="list-inline-item me-3" id="eventLocationMeta">
+        <i class="bi bi-geo-alt me-1"></i> {{event.location}}
+      </li>
+      <li class="list-inline-item">
+        <span id="eventStatusBadge" class="badge rounded-pill text-bg-success">Open</span>
+      </li>
+    </ul>
+  </header>
+
+  <!-- 2-column layout -->
+  <div class="row g-4">
+
+    <!-- LEFT: media + description + map + reviews -->
+    <div class="col-lg-8">
+
+      <!-- Hero carousel -->
+      <div id="eventCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+        <div class="carousel-inner rounded-4 overflow-hidden">
+          {% set image_list = event.images.split(',') %}
+          {% for image in image_list %}
+          <div class="carousel-item {% if loop.index0 == 0%}active{% endif %}" id="carouselImage{{ loop.index0 + 1}}" data-bs-interval="6000">
+            <img src="{{ url_for('static', filename='uploads/'~ image.strip()) }}" class="w-100 h-100 object-fit-cover" alt="Event photo {{ loop.index0+1 }}">
+          </div>
+          {% endfor %}
+        </div>
+        <button id="carouselPrev" class="carousel-control-prev" type="button" data-bs-target="#eventCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span><span class="visually-hidden">Previous</span>
+        </button>
+        <button id="carouselNext" class="carousel-control-next" type="button" data-bs-target="#eventCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span><span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+      <!-- About / description -->
+      <section id="aboutSection" class="mb-4">
+        <h2 class="h5">About this event</h2>
+        <p class="mb-2">
+          {{event.description}}
+        </p>
+        <ul class="list-unstyled small text-muted">
+          <li class="d-flex"><i class="bi bi-people me-2"></i> {{event.experience_level}}</li>
+          <li class="d-flex"><i class="bi bi-clock me-2"></i>{{event.venue_details}}</li>
+        </ul>
+      </section>
+
+      <!-- Location / map -->
+      <section id="locationSection" class="mb-4">
+        <h2 class="h5">Location</h2>
+        <p id="eventAddress" class="text-muted small mb-2">
+          <i class="bi bi-geo-alt me-1"></i> {{event.location}}
+        </p>
+        <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+          <iframe id="eventMap"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2219.1672168818045!2d153.02308600170437!3d-27.480105751916845!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b915a0def52db3f%3A0x345a1e35a05de0cf!2sRiver%20Quay%20Green%20South%20Bank!5e0!3m2!1sen!2sau!4v1757236531718!5m2!1sen!2sau"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </section>
+
+      <!-- Host -->
+      <section id="hostSection" class="mb-4">
+        <h2 class="h5">Hosted by</h2>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body d-flex align-items-center gap-3">
+            <img id="hostAvatar" src="{{ url_for('static', filename='img/QutSportPhoto.png') }}"
+              alt="Host avatar" width="56" height="56" class="rounded-circle">
+            <div>
+              <div id="hostName" class="fw-semibold">QUT Sport • Wellness Team</div>
+              <div id="hostStats" class="small text-muted">12 upcoming sessions · 4.8 ★ (124 reviews)</div>
+            </div>
+            <div class="ms-auto">
+              <a id="messageHostButton" class="btn btn-outline-primary btn-sm" href="#">Message host</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reviews -->
+      <section id="reviewSection" class="mb-4">
+        <h2 class="h5">Reviews</h2>
+        <ul class="list-group list-group-flush">
+          <li id="reviewItem1" class="list-group-item px-0">
+            <div class="d-flex align-items-start gap-3">
+              <img src="https://media.licdn.com/dms/image/v2/D4D03AQHkC7N5AFn6dg/profile-displayphoto-shrink_200_200/B4DZdXUIsHHkAY-/0/1749516586626?e=2147483647&v=beta&t=UaWkO_g2TE3ama7-vOL-OR8r4wKCGNXM6sEd-5MFJb0" class="rounded-circle" width="48" height="48" alt="">
+              <div>
+                <div class="fw-semibold">Nodir
+                  <span class="text-warning">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                  </span>
+                </div>
+                <div class="text-muted small mb-1">Attended Sep 2024</div>
+                <p class="mb-0">Great atmosphere, gentle pace, perfect start to the day!</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Add comment -->
+        <form id="reviewForm" class="mt-3">
+          <label class="form-label small" for="reviewText">Leave a comment</label>
+          <textarea id="reviewText" class="form-control" rows="3" placeholder="Share your thoughts…"></textarea>
+          <div class="mt-2 d-flex gap-2">
+            <button id="postReviewButton" type="button" class="btn btn-primary btn-sm" form="reviewForm">Post</button>
+            <button id="cancelReviewButton" type="button" class="btn btn-outline-secondary btn-sm">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- RIGHT: booking card -->
+    <aside id="bookingCard" class="col-lg-4">
+      <div class="card shadow-sm position-sticky top-0" style="z-index: 1;">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span id="bookingStatusBadge" class="badge text-bg-success">Open</span>
+            <a id="shareEventLink" href="#" class="text-muted small">
+              <i class="bi bi-share me-1"></i>Share
+            </a>
+          </div>
+
+          <div id="eventPrice" class="display-6 fw-bold mb-2">${{event.ticket_price}}</div>
+          <p class="text-muted small mb-3">Free for QUT members</p>
+
+          <div class="mb-3">  
+            <label for="ticketCountInput" class="form-label">Tickets</label>
+            <div class="input-group">
+              <button id="decreaseTicketButton" class="btn btn-outline-secondary" type="button">-</button>
+              <input id="ticketCountInput" type="number" class="form-control text-center" value="1" min="1">
+              <button id="increaseTicketButton" class="btn btn-outline-secondary" type="button">+</button>
+            </div>
+            <div id="ticketStatus" class="form-text">{{event.number_of_tickets}} remaining • 
+              <span class="text-warning"><i class="bi bi-fire"></i> Selling fast</span>
+            </div>
+          </div>
+
+          <button id="bookNowButton" class="btn btn-primary w-100 mb-2">Book Now</button>
+          <button id="addToCalendarButton" class="btn btn-outline-secondary w-100">Add to calendar</button>
+
+          <hr>
+
+          <ul class="list-unstyled small text-muted mb-0">
+            <li><i class="bi bi-shield-check me-2"></i> Secure checkout</li>
+            <li><i class="bi bi-info-circle me-2"></i> No refunds</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}
